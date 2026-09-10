@@ -3,6 +3,6 @@ OpenAI Codex is licensed under the Apache License, Version 2.0.
 Upstream: https://github.com/openai/codex
 Pinned release: rust-v0.153.4
 
-PromptLang's modifications add lexical condition highlighting to the terminal
+PromptLang's modifications add lexical instruction highlighting to the terminal
 composer. PromptLang is an independent prototype and is not an official OpenAI
 plugin or release.

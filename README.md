@@ -1,15 +1,38 @@
 # PromptLang
 
-A Codex CLI prototype that highlights condition words in the prompt as you type.
+A Codex CLI prototype that highlights instruction words and phrases as you type.
+Colors distinguish meaning; bold gives hard constraints and direct instructions
+more visual weight.
 
-`if`, `when`, `unless`, `else`, and `otherwise` appear in your terminal's magenta
-color. Matching ignores capitalization and respects Unicode word boundaries:
-`IF` is highlighted; `iffy`, `elsewhere`, and `if_ready` are ordinary text.
+| Meaning | Appearance | Words and phrases |
+| --- | --- | --- |
+| Prohibitions and negation | **Red, bold** | `must not`, `shall not`, `do not`, `don't`, `don’t`, `never`, `not` |
+| Restrictions and exceptions | **Magenta, bold** | `only if`, `only`, `unless`, `except` |
+| Conditions and branches | Magenta | `if`, `when`, `then`, `else`, `otherwise` |
+| Direct instructions | **Cyan, bold** | `do`, `must`, `required`, `shall`, `ensure`, `make sure`, `have to` |
+| Quantities and limits | Cyan | `all`, `every`, `each`, `exactly`, `always`, `at least`, `at most` |
+| Order and timing | **Normal foreground, bold** | `before`, `after`, `until`, `first`, `finally` |
+| Permission and preferences | Green | `may`, `optional`, `should`, `prefer`, `not required`, `need not`, `do not have to`, `do not need to` (including `don't` / `don’t` forms) |
+| Advice against an action | Red | `avoid`, `should not` |
 
 ```text
-If the tests pass, prepare the change. Otherwise explain the failure.
-When editing code, preserve the public API unless a change is necessary.
+Do not edit generated files. Only if needed, update tests.
+If checks fail, you must fix every failure before finishing.
+You may use at most 3 attempts; otherwise stop.
+Not required: screenshots. Avoid unrelated changes.
 ```
+
+The palette uses familiar stop/permission conventions for red and green. Magenta
+marks branching and scope, cyan marks actions and limits, and neutral bold marks
+sequence. Most prose keeps the normal foreground. Bold distinguishes firm rules
+from softer advice without relying on hue alone; instructions are never dimmed.
+
+Keyword colors use the terminal's ANSI palette, so their actual shades follow your
+theme. Terminal themes and settings also affect contrast and whether bold text
+uses brighter colors ([terminal appearance documentation](https://code.visualstudio.com/docs/terminal/appearance)).
+The prototype does not impose RGB values or claim that one palette is optimal
+for every theme or reader. These are visual conventions, not measured rankings
+of keyword effects on a model.
 
 ## Build and run
 
@@ -38,17 +61,26 @@ This is a separate Codex build, using your normal Codex configuration and login.
 Preparation copies the matching official Code Mode helper into the build cache;
 the helper stays beside the custom executable. A native installation such as the
 Homebrew package is required for this prototype; npm shims are not supported.
-It does not replace the installed `codex` command. Condition highlighting applies
+It does not replace the installed `codex` command. Instruction highlighting applies
 to the native terminal composer; the Codex desktop and IDE composers are separate.
 
 ## Behavior and scope
 
 - Highlighting changes rendering only. Submitted prompts remain plain text.
+- Matching ignores capitalization and respects Unicode word boundaries: `IF`
+  matches; `iffy`, `elsewhere`, and `if_ready` remain ordinary text.
+- The longest phrase wins. `do not` is a prohibition; `do not have to` expresses
+  discretion. The whole phrase updates as you type or delete.
+- Spaces, tabs, and line breaks can join phrase words. Punctuation cannot:
+  `must, not` remains two separate matches.
+- `not only` and questions starting `do you`, `do I`, `do we`, or `do they` stay
+  plain rather than misleadingly marking a prohibition or command.
 - Cursor movement, wrapping, editing, and submission use Codex's existing editor.
-- Native mention and search highlights retain priority.
-- Shell mode and masked input retain their native presentation.
-- This first version is lexical: condition words inside quotes or code are also
-  highlighted. It does not parse conditional clauses or change model behavior.
+- Native mentions, attachments, search highlights, shell mode, and masked input
+  retain their native presentation.
+- This is a lexical prototype, not an English parser. Quoted prose and code can
+  contain matches; `May` can mean a month. It does not infer full clause scope,
+  resolve every ambiguous phrase, or change model behavior.
 
 ## Tests
 
@@ -64,16 +96,19 @@ To run only the prototype's tests:
 ./scripts/test.sh -E 'test(promptlang_tests)'
 ```
 
-Tests cover word boundaries, Unicode offsets, wrapping, cursor preservation,
-typing/deletion, shell mode, history-search priority, exact submitted text, and a
-styled composer snapshot.
+Tests cover phrase precedence, negation versus discretion, Unicode offsets,
+wrapping, cursor preservation, typing/deletion, shell mode, history-search
+priority, native mentions and attachments, masked input, exact submitted text,
+and styled composer snapshots with light and dark background defaults.
 
-Validation on macOS (2026-09-09): the executable builds, and all seven prototype
-tests pass. The full TUI suite reports 4,063 passed, 35 failed, and 6 skipped.
+Validation on macOS (2026-09-09): the executable builds, and all 15 prototype
+tests pass. The full TUI suite reports 4,071 passed, 35 failed, and 6 skipped.
 Running the same suite with the highlighting patch removed produces the exact
 same 35 failures (4,056 passed): release-version snapshots and terminal-dependent
 expectations. These upstream snapshots are left intact; no failures are hidden
-or automatically accepted. `just fmt` and shell syntax checks also pass.
+or automatically accepted. `just fmt` and shell syntax checks also pass. The
+wiring patch applies cleanly to the pinned source archive and produces the
+tested composer source.
 
 ## Implementation
 
