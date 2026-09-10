@@ -3,9 +3,10 @@ set -euo pipefail
 
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 build_dir="$repo_root/.build"
-source_dir="$build_dir/codex"
-archive="$build_dir/codex-0.153.4.tar.gz"
-archive_sha256=74d988c0e154aad2b8d0cca4e950fc97fe2a29ff5ebe3b0070cce6d949c9a307
+codex_version=0.154.0
+source_dir="$build_dir/codex-$codex_version"
+archive="$build_dir/codex-$codex_version.tar.gz"
+archive_sha256=1c4cdc3b87ba290b5d110425b4f6ff21663e236580bc760d1e149bd2d9f9519f
 
 for command in cargo git curl tar shasum python3; do
     if ! command -v "$command" >/dev/null 2>&1; then
@@ -19,7 +20,7 @@ export CARGO_TARGET_DIR="$build_dir/target"
 export CARGO_INCREMENTAL=0
 
 # Use the official runtime for this release instead of rebuilding V8 for a UI patch.
-runtime="$build_dir/codex-code-mode-host-0.153.4"
+runtime="$build_dir/codex-code-mode-host-$codex_version"
 if [[ ! -x "$runtime" ]]; then
     "$repo_root/scripts/prepare-runtime.sh" "$build_dir"
 fi
@@ -28,7 +29,7 @@ cp "$runtime" "$CARGO_TARGET_DIR/dev-small/codex-code-mode-host"
 
 if [[ ! -f "$archive" ]]; then
     curl --fail --location --silent --show-error --retry 3 \
-        https://github.com/openai/codex/archive/refs/tags/rust-v0.153.4.tar.gz \
+        "https://github.com/openai/codex/archive/refs/tags/rust-v$codex_version.tar.gz" \
         --output "$archive.download"
     mv "$archive.download" "$archive"
 fi
@@ -54,7 +55,7 @@ for patch_file in "$repo_root/codex/release-lock.patch" "$repo_root/codex/condit
     elif git -C "$source_dir" apply --check "$patch_file"; then
         git -C "$source_dir" apply "$patch_file"
     else
-        printf 'Cached source does not match the patch. Move .build/codex aside and rebuild.\n' >&2
+        printf 'Cached source does not match the patch. Move %s aside and rebuild.\n' "$source_dir" >&2
         exit 1
     fi
 done

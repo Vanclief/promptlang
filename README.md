@@ -15,7 +15,7 @@ type and keeps the submitted prompt plain text.
 
 | Client | Integration | Highlighting appears in |
 | --- | --- | --- |
-| **Codex CLI** | Separate build of Codex 0.153.4 | Native prompt composer |
+| **Codex CLI** | Separate build of Codex 0.154.0 | Native prompt composer |
 | **Pi** | Custom editor extension | Native prompt composer |
 | **Claude Code** | Separate patched copy of Claude 2.1.267 | Native prompt composer; Ctrl+G fallback |
 
@@ -222,8 +222,8 @@ Thirty-two JavaScript tests cover editor rendering, cursor behavior, Unicode,
 pastes, Claude save/cancel, native patch boundaries, version checks, and installer
 safety. CI runs them on macOS/Linux with Node 22/24, and separately prepares and
 launches native Claude copies from the official platform packages. The Codex
-overlay has 15 passing prototype tests; its full suite has 35 known upstream
-failures reproduced without PromptLang.
+overlay has 15 passing composer tests on Codex 0.154.0; see the development
+notes for the wider upstream suite and its reproduced failures.
 
 See [development notes](docs/development.md) for Codex builds, tests, dependency
 pins, vocabulary changes, and preview generation. Small contributions and

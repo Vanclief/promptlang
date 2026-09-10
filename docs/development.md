@@ -16,16 +16,18 @@ pinned in `package-lock.json`. Native Claude adds no npm dependencies.
 to `TextArea::render_ref_styled_with_highlights` in the native composer. The Rust
 source and tests are copied into the cached upstream source before each build or test.
 
-Upstream is [OpenAI Codex 0.153.4](https://github.com/openai/codex/tree/rust-v0.153.4),
-commit `3d2ee51ca2d5db578f328aa75e20aa22c0197c9a`. The source archive's SHA-256 is
+Upstream is [OpenAI Codex 0.154.0](https://github.com/openai/codex/tree/rust-v0.154.0),
+commit `6b9826e3aa83b1a5947db50f4332cb9c65f1b340`. The source archive's SHA-256 is
 pinned in `scripts/prepare.sh`. `codex/release-lock.patch` repairs the release
-archive's stale workspace-package versions (`0.0.0` → `0.153.4`); all third-party
-lock entries are unchanged, and builds still use `--locked`. No new Rust
-dependency or model API is introduced.
+archive's stale workspace-package versions (`0.0.0` → `0.154.0`); all third-party
+lock entries are unchanged, and builds still use `--locked`. PromptLang adds no
+Rust dependency or model API beyond the pinned upstream release.
 
 Edit the files under `codex/`, then rerun the build. The cached upstream checkout
-is disposable; it is not the source of truth. If the wiring patch changes, move
-`.build/codex` aside before rebuilding. Compiled dependencies live separately in
+is disposable; it is not the source of truth. Each release gets its own source
+directory, currently `.build/codex-0.154.0`, so upgrading automatically prepares
+fresh source. If the wiring patch changes for the same release, move that
+directory aside before rebuilding. Compiled dependencies live separately in
 `.build/target` and can be reused.
 
 ## Native Claude integration
@@ -99,10 +101,16 @@ For Codex, install `just` and `cargo-nextest`, then run:
 ./scripts/test.sh
 ```
 
-The Rust overlay has 15 passing prototype tests. On macOS, the full Codex 0.153.4
-TUI suite has 4,071 passes, 35 failures, and 6 skips. The exact same 35 failures
-occur without PromptLang (4,056 passes): release-version snapshots and
-terminal-dependent expectations. These upstream snapshots are left unchanged.
+Codex **0.154.0** builds successfully with `--locked`, and all **15 PromptLang
+composer tests pass** on macOS arm64. The installed `codex-pl` reports 0.154.0;
+CLI and matching Code Mode runtime startup checks also pass. The highlighting
+patch applies unchanged from the previous release.
+
+The full 0.154.0 TUI suite has **4,289 passes, 40 failures, and 6 skips** in this
+environment. Rerunning the 40 failing tests with the PromptLang patch removed
+reproduces **all 40 failures**. Thirty-five match the prior 0.153.4 baseline;
+five are additional upstream failures in this release. Upstream test snapshots
+and expectations are left unchanged.
 
 ## Updating the pinned Codex build
 
@@ -113,9 +121,11 @@ before adding it to the supported-platform list. Downloads are verified before
 extraction. Runtime downloads support macOS/Linux on arm64 and x86_64; Windows
 shell installation is not currently provided.
 
-Cached source is disposable. If a wiring patch changes, move `.build/codex` aside;
-`.build/target` retains compiled dependencies. `scripts/prepare.sh` applies the
-patches and copies the authoritative `codex/*.rs` files before a build or test.
+Cached source is disposable and versioned. If a wiring patch changes for the
+same release, move `.build/codex-0.154.0` aside; `.build/target` retains compiled
+dependencies. The previous unversioned `.build/codex` cache is kept and no longer
+used. `scripts/prepare.sh` applies the patches and copies the authoritative
+`codex/*.rs` files before a build or test.
 
 ## Updating the preview
 
