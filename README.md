@@ -93,6 +93,26 @@ and search your history. Native mentions, attachments, shell mode, and masked
 input keep their existing presentation. This uses your normal Codex login and
 configuration. The desktop and IDE composers are separate.
 
+#### macOS Keychain prompts
+
+`codex-pl` uses a locally built executable with a different signing identity from
+official Codex. macOS can ask it to approve access to existing Codex or MCP
+credentials. The dialog may name **`codex`**, the underlying executable, and
+**`Codex MCP Credentials`**, an MCP credential item. MCP can use Keychain even
+when the main Codex login is stored in `auth.json`.
+
+When the dialog is for this PromptLang build and an expected credential, choose
+**Always Allow** to remember access to that item. **Allow / Allow Once** approves
+only one read; upstream Codex reads credentials for both status checks and
+connections, so several dialogs can appear during one launch. Different items
+can each need approval. See [Apple's Keychain guidance](https://support.apple.com/guide/mac-help/allow-apps-to-access-your-keychain-kychn002/mac).
+
+A rebuilt executable can require approval again: the local build uses an
+[ad hoc signature tied to its code](https://developer.apple.com/documentation/technotes/tn3127-inside-code-signing-requirements).
+If the same item keeps prompting after **Always Allow**, without rebuilding,
+include the dialog's application/item names and whether it repeats on every
+launch in your bug report. Do not include passwords or credential contents.
+
 ### Pi
 
 Start `promptlang-pi` and type normally. The extension retains Pi's app shortcuts,
