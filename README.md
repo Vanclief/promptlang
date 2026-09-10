@@ -1,132 +1,190 @@
 # PromptLang
 
-A Codex CLI prototype that highlights instruction words and phrases as you type.
-Colors distinguish meaning; bold gives hard constraints and direct instructions
-more visual weight.
+[![Checks](https://github.com/Vanclief/promptlang/actions/workflows/ci.yml/badge.svg)](https://github.com/Vanclief/promptlang/actions/workflows/ci.yml)
 
-| Meaning | Appearance | Words and phrases |
+**See the instructions in your prompts.**
+
+PromptLang highlights the words that shape an instruction: conditions,
+prohibitions, requirements, limits, and permissions. It colors your draft as you
+type and keeps the submitted prompt plain text.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/preview-dark.svg">
+  <img src="docs/assets/preview-light.svg" alt="PromptLang terminal preview: red prohibitions, magenta conditions, cyan instructions and limits, green permissions, and bold ordering words." width="1040">
+</picture>
+
+| Client | Integration | Highlighting appears in |
 | --- | --- | --- |
-| Prohibitions and negation | **Red, bold** | `must not`, `shall not`, `do not`, `don't`, `don’t`, `never`, `not` |
-| Restrictions and exceptions | **Magenta, bold** | `only if`, `only`, `unless`, `except` |
-| Conditions and branches | Magenta | `if`, `when`, `then`, `else`, `otherwise` |
-| Direct instructions | **Cyan, bold** | `do`, `must`, `required`, `shall`, `ensure`, `make sure`, `have to` |
-| Quantities and limits | Cyan | `all`, `every`, `each`, `exactly`, `always`, `at least`, `at most` |
-| Order and timing | **Normal foreground, bold** | `before`, `after`, `until`, `first`, `finally` |
-| Permission and preferences | Green | `may`, `optional`, `should`, `prefer`, `not required`, `need not`, `do not have to`, `do not need to` (including `don't` / `don’t` forms) |
-| Advice against an action | Red | `avoid`, `should not` |
+| **Codex CLI** | Separate build of Codex 0.153.4 | Native prompt composer |
+| **Pi** | Custom editor extension | Native prompt composer |
+| **Claude Code** | External terminal editor | **Ctrl+G** while editing a draft |
+
+Early prototype for **macOS and Linux**. Colors follow your terminal's palette;
+the preview illustrates one light/dark palette. This is a lexical highlighter,
+not a model-specific compiler or a measured ranking of keyword effectiveness.
+
+## Install
+
+Clone the repository and choose a client:
+
+```sh
+git clone https://github.com/Vanclief/promptlang.git
+cd promptlang
+```
+
+| Install | Run from any project |
+| --- | --- |
+| `./install.sh codex` | `promptlang-codex` |
+| `./install.sh claude` | `promptlang-claude` |
+| `./install.sh pi` | `promptlang-pi` |
+
+Or install all three with `./install.sh all`.
+
+The installer prepares dependencies and adds launchers to `~/.local/bin`. It
+refuses to overwrite unrelated commands. Your existing `codex`, `claude`, and
+`pi` commands and client settings stay in place. **Keep the cloned repository:**
+the launchers use it. Normal client arguments are forwarded, and the current
+working directory is preserved.
+
+If the launcher directory is not on your PATH, add this to your shell startup
+file (`~/.zshrc` for zsh or `~/.bashrc` for bash), then open a new terminal:
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Use `--bin-dir /your/bin` for a different destination. You can also run launchers
+directly from `./bin/` after setup.
+
+### Requirements
+
+- **Claude and Pi:** Node.js **22.19+** with npm. Claude Code must already be
+  installed. Pi uses your installed CLI, or the pinned local Pi **0.85.0** that
+  setup installs as a dependency.
+- **Codex:** Rust installed through rustup, Python 3, Git, curl, tar, shasum, and
+  a C/C++ build toolchain. The pinned source selects Rust **1.95.0**. On macOS,
+  install Xcode Command Line Tools. Linux needs the native build dependencies,
+  including a C/C++ compiler and development libraries required by Codex.
+
+**Codex's first setup compiles upstream Codex and can take considerable time and
+disk space.** Later builds reuse the cache. Setup downloads the matching official
+Code Mode runtime and verifies its pinned SHA-256; an existing Codex installation
+is not required. Prebuilt PromptLang binaries are not published yet.
+
+## Using it
+
+Try typing this draft to see the categories:
 
 ```text
-Do not edit generated files. Only if needed, update tests.
+Do not edit generated files. Only if needed, update the tests.
 If checks fail, you must fix every failure before finishing.
 You may use at most 3 attempts; otherwise stop.
-Not required: screenshots. Avoid unrelated changes.
 ```
 
-The palette uses familiar stop/permission conventions for red and green. Magenta
-marks branching and scope, cyan marks actions and limits, and neutral bold marks
-sequence. Most prose keeps the normal foreground. Bold distinguishes firm rules
-from softer advice without relying on hue alone; instructions are never dimmed.
+### Codex CLI
 
-Keyword colors use the terminal's ANSI palette, so their actual shades follow your
-theme. Terminal themes and settings also affect contrast and whether bold text
-uses brighter colors ([terminal appearance documentation](https://code.visualstudio.com/docs/terminal/appearance)).
-The prototype does not impose RGB values or claim that one palette is optimal
-for every theme or reader. These are visual conventions, not measured rankings
-of keyword effects on a model.
+Start `promptlang-codex` and type normally. Keywords update while you edit, wrap,
+and search your history. Native mentions, attachments, shell mode, and masked
+input keep their existing presentation. This uses your normal Codex login and
+configuration. The desktop and IDE composers are separate.
 
-## Build and run
+### Pi
 
-Requirements: macOS or Linux, a native Codex **0.153.4** installation with its
-`codex-code-mode-host` helper beside the native executable, Rust installed through
-rustup, Python 3, Git, curl, tar, and shasum. The pinned Codex source selects Rust
-1.95.0. On macOS, install Xcode Command Line Tools; Linux also needs Codex's native
-build prerequisites.
+Start `promptlang-pi` and type normally. The extension retains Pi's app shortcuts,
+history, cursor, wrapping, autocomplete, and pasted-text expansion.
+
+For persistent installation in the regular `pi` command:
 
 ```sh
-./scripts/build.sh
-./bin/promptlang-codex
+pi install /absolute/path/to/promptlang
 ```
 
-The first build downloads and verifies Codex 0.153.4 and compiles its dependencies.
-Allow time and disk space for a full Rust build. Subsequent builds reuse `.build/`.
-The prototype uses Codex's `dev-small` profile for a smaller development build.
+Then start a new Pi session. Use either persistent installation or the launcher
+so the extension loads once. Pi has one custom editor slot; another editor
+extension can replace PromptLang depending on load order. Non-interactive and
+RPC sessions are unaffected. See Pi's
+[extension documentation](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/extensions.md).
 
-The launcher accepts normal Codex arguments and preserves your working directory:
+### Claude Code
+
+Start `promptlang-claude`, type a draft, and press **Ctrl+G**.
+
+| In the highlighted editor | Action |
+| --- | --- |
+| **Enter** | Insert a newline |
+| **Ctrl+S** | Save and return to Claude's draft |
+| **Ctrl+C** | Cancel and keep the original draft |
+
+Saving returns the text to Claude **without submitting it**. The launcher sets
+`VISUAL` and `EDITOR` for that Claude process and its children. Other Claude
+actions that open the configured external editor use PromptLang too.
+
+Claude's documented extension API has no input-token rendering hook, so
+highlighting is available through its supported
+[external editor shortcut](https://code.claude.com/docs/en/interactive-mode).
+Its built-in composer is unchanged. Tested end to end with Claude Code **2.1.267**.
+
+Cancel and no-op saves preserve the original file byte-for-byte. Actual edits use
+Pi's editor conventions: LF newlines and tabs expanded to four spaces. Save
+reports a conflict if another process changes the file while you edit.
+
+## The colors
+
+| Meaning | Style | Examples |
+| --- | --- | --- |
+| Prohibitions / negation | **Bold red** | `DO NOT`, `MUST NOT`, `DON'T`, `NEVER`, `NOT` |
+| Restrictions / exceptions | **Bold magenta** | `ONLY IF`, `ONLY`, `UNLESS`, `EXCEPT` |
+| Conditions / branches | Magenta | `IF`, `WHEN`, `THEN`, `ELSE`, `OTHERWISE` |
+| Direct instructions | **Bold cyan** | `DO`, `MUST`, `ENSURE`, `REQUIRED`, `MAKE SURE` |
+| Quantities / limits | Cyan | `EVERY`, `ALL`, `EXACTLY`, `AT LEAST`, `AT MOST` |
+| Order / timing | **Normal foreground, bold** | `BEFORE`, `AFTER`, `UNTIL`, `FIRST`, `FINALLY` |
+| Permission / preference | Green | `MAY`, `OPTIONAL`, `SHOULD`, `PREFER`, `NOT REQUIRED` |
+| Advice against an action | Red | `AVOID`, `SHOULD NOT` |
+
+Red and green use familiar stop/permission conventions. Bold gives firm
+instructions more visual weight without relying on hue alone. Ordinary prose
+keeps the default foreground, and instructions are never dimmed. Actual shades
+and contrast depend on your [terminal theme](https://code.visualstudio.com/docs/terminal/appearance).
+
+Matching ignores case and respects Unicode word boundaries. The longest phrase
+wins: **`do not` is red; `do not have to` is green**. Phrases can span whitespace
+and line breaks, but cannot cross punctuation. `not only` and `do you` stay plain.
+
+This is a vocabulary, not a full English parser. Words inside quotes or code can
+match, and `May` can also be a month. Highlighting does not infer full clause scope
+or change what a model receives.
+
+## Update or uninstall
 
 ```sh
-/path/to/promptlang/bin/promptlang-codex --no-alt-screen
+git pull --ff-only
+./install.sh pi       # or claude, codex, all
 ```
-
-This is a separate Codex build, using your normal Codex configuration and login.
-Preparation copies the matching official Code Mode helper into the build cache;
-the helper stays beside the custom executable. A native installation such as the
-Homebrew package is required for this prototype; npm shims are not supported.
-It does not replace the installed `codex` command. Instruction highlighting applies
-to the native terminal composer; the Codex desktop and IDE composers are separate.
-
-## Behavior and scope
-
-- Highlighting changes rendering only. Submitted prompts remain plain text.
-- Matching ignores capitalization and respects Unicode word boundaries: `IF`
-  matches; `iffy`, `elsewhere`, and `if_ready` remain ordinary text.
-- The longest phrase wins. `do not` is a prohibition; `do not have to` expresses
-  discretion. The whole phrase updates as you type or delete.
-- Spaces, tabs, and line breaks can join phrase words. Punctuation cannot:
-  `must, not` remains two separate matches.
-- `not only` and questions starting `do you`, `do I`, `do we`, or `do they` stay
-  plain rather than misleadingly marking a prohibition or command.
-- Cursor movement, wrapping, editing, and submission use Codex's existing editor.
-- Native mentions, attachments, search highlights, shell mode, and masked input
-  retain their native presentation.
-- This is a lexical prototype, not an English parser. Quoted prose and code can
-  contain matches; `May` can mean a month. It does not infer full clause scope,
-  resolve every ambiguous phrase, or change model behavior.
-
-## Tests
-
-Install `just` and `cargo-nextest`, then run the affected Codex TUI suite:
 
 ```sh
-./scripts/test.sh
+./install.sh all --uninstall
 ```
 
-To run only the prototype's tests:
+Uninstall removes only PromptLang-managed launchers. If you installed Pi's
+extension persistently, also run `pi remove /absolute/path/to/promptlang`.
+Use the same `--bin-dir` when uninstalling from a custom location. Client
+installations, settings, the repository, and build caches are kept.
+
+## Development
 
 ```sh
-./scripts/test.sh -E 'test(promptlang_tests)'
+npm ci --ignore-scripts
+npm test
 ```
 
-Tests cover phrase precedence, negation versus discretion, Unicode offsets,
-wrapping, cursor preservation, typing/deletion, shell mode, history-search
-priority, native mentions and attachments, masked input, exact submitted text,
-and styled composer snapshots with light and dark background defaults.
+Twenty JavaScript tests cover editor rendering, cursor behavior, Unicode,
+pastes, Claude save/cancel, and installer safety. CI runs them on macOS/Linux
+with Node 22/24. The Codex overlay has 15 passing prototype tests; its full suite
+has 35 known upstream failures reproduced without PromptLang.
 
-Validation on macOS (2026-09-09): the executable builds, and all 15 prototype
-tests pass. The full TUI suite reports 4,071 passed, 35 failed, and 6 skipped.
-Running the same suite with the highlighting patch removed produces the exact
-same 35 failures (4,056 passed): release-version snapshots and terminal-dependent
-expectations. These upstream snapshots are left intact; no failures are hidden
-or automatically accepted. `just fmt` and shell syntax checks also pass. The
-wiring patch applies cleanly to the pinned source archive and produces the
-tested composer source.
+See [development notes](docs/development.md) for Codex builds, tests, dependency
+pins, vocabulary changes, and preview generation. Small contributions and
+reproducible bug reports are welcome; include the client version, terminal,
+platform, and a minimal prompt that shows the problem.
 
-## Implementation
-
-`codex/promptlang.rs` supplies render-only byte ranges using Codex's existing
-`unicode-segmentation` dependency. `codex/conditions.patch` connects these ranges
-to `TextArea::render_ref_styled_with_highlights` in the native composer. The Rust
-source and tests are copied into the cached upstream source before each build or test.
-
-Upstream is [OpenAI Codex 0.153.4](https://github.com/openai/codex/tree/rust-v0.153.4),
-commit `3d2ee51ca2d5db578f328aa75e20aa22c0197c9a`. The source archive's SHA-256 is
-pinned in `scripts/prepare.sh`. `codex/release-lock.patch` repairs the release
-archive's stale workspace-package versions (`0.0.0` → `0.153.4`); all third-party
-lock entries are unchanged, and builds still use `--locked`. No new Rust
-dependency or model API is introduced.
-
-Edit the files under `codex/`, then rerun the build. The cached upstream checkout
-is disposable; it is not the source of truth. If the wiring patch changes, move
-`.build/codex` aside before rebuilding. Compiled dependencies live separately in
-`.build/target` and can be reused.
-
-Licensed under Apache-2.0. See `LICENSE` and `NOTICE`.
+[Apache-2.0](LICENSE). Independent project; see [NOTICE](NOTICE) for upstream attribution.

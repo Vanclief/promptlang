@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="414" viewBox="0 0 1040 414" role="img" aria-labelledby="title description">
+<title id="title">PromptLang: see the instructions in your prompts</title>
+<desc id="description">A terminal illustration with red prohibitions, magenta conditions, cyan instructions and limits, green permissions, and bold sequencing words.</desc>
+<rect width="1040" height="414" rx="20" fill="#11151c"/>
+<text x="38" y="53" font-family="system-ui, sans-serif" font-size="27" font-weight="750" fill="#d9e1ed">Prompt<tspan fill="#dfb0ff">Lang</tspan></text>
+<text x="1002" y="51" text-anchor="end" font-family="system-ui, sans-serif" font-size="16" fill="#9aa9bd">See the instructions in your prompts.</text>
+<rect x="28" y="79" width="984" height="279" rx="12" fill="#1a202b" stroke="#303949"/>
+<path d="M28 120H1012" stroke="#303949"/>
+<circle cx="48" cy="100" r="4" fill="#ff8991"/><circle cx="64" cy="100" r="4" fill="#dfb0ff"/><circle cx="80" cy="100" r="4" fill="#9bd6a2"/>
+<text x="982" y="105" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#9aa9bd">prompt.txt</text>
+<g font-family="Menlo, Consolas, monospace" font-size="21" fill="#d9e1ed"><text x="58" y="166" xml:space="preserve"><tspan fill="#ff8991" font-weight="700">Do not</tspan> edit generated files.</text>
+<text x="58" y="202" xml:space="preserve"><tspan fill="#dfb0ff" font-weight="700">Only if</tspan> needed, update the tests.</text>
+<text x="58" y="238" xml:space="preserve"><tspan fill="#dfb0ff" font-weight="400">If</tspan> checks fail, you <tspan fill="#80d7ef" font-weight="700">must</tspan> fix <tspan fill="#80d7ef" font-weight="400">every</tspan> failure.</text>
+<text x="58" y="274" xml:space="preserve">You <tspan fill="#9bd6a2" font-weight="400">may</tspan> use <tspan fill="#80d7ef" font-weight="400">at most</tspan> 3 attempts; <tspan fill="#dfb0ff" font-weight="400">otherwise</tspan> stop.</text>
+<text x="58" y="310" xml:space="preserve">Run checks <tspan fill="#d9e1ed" font-weight="700">before</tspan> finishing. <tspan fill="#ff8991" font-weight="400">Avoid</tspan> unrelated changes.</text></g>
+<text x="38" y="389" font-family="system-ui, sans-serif" font-size="15" fill="#9aa9bd">Codex CLI · Pi extension · Claude Code via Ctrl+G</text>
+<text x="1002" y="389" text-anchor="end" font-family="system-ui, sans-serif" font-size="15" fill="#9aa9bd">Plain text in. Clear instructions.</text>
+</svg>

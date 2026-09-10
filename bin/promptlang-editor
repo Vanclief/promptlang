@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+promptlang_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ ! -d "$promptlang_root/node_modules/@earendil-works/pi-tui" ]]; then
+  echo "PromptLang editor dependencies are missing. Run npm ci in $promptlang_root." >&2
+  exit 1
+fi
+exec node "$promptlang_root/claude/editor.js" "$@"

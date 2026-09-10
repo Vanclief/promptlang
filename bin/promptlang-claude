@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+promptlang_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+# A command name keeps EDITOR valid even when the repository path has spaces.
+export PATH="$promptlang_root/bin:$PATH"
+export VISUAL=promptlang-editor
+export EDITOR=promptlang-editor
+exec claude "$@"

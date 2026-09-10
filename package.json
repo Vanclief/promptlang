@@ -1,0 +1,25 @@
+{
+  "name": "promptlang",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Instruction highlighting for Codex, Pi, and Claude Code's external editor",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22.19.0" },
+  "keywords": ["pi-package"],
+  "pi": { "extensions": ["./pi/extension.js"] },
+  "scripts": {
+    "test": "node scripts/sync-vocabulary.mjs --check && node --test test/*.test.mjs",
+    "sync-vocabulary": "node scripts/sync-vocabulary.mjs"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.85.0",
+    "@earendil-works/pi-tui": "0.85.0",
+    "@xterm/headless": "5.5.0",
+    "jiti": "2.7.0"
+  }
+}

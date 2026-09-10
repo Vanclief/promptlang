@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+promptlang_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if command -v pi >/dev/null 2>&1; then
+  exec pi --extension "$promptlang_root/pi/extension.js" "$@"
+fi
+pi_cli="$promptlang_root/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
+if [[ ! -f "$pi_cli" ]]; then
+  echo "Run $promptlang_root/install.sh pi first." >&2
+  exit 1
+fi
+exec node "$pi_cli" --extension "$promptlang_root/pi/extension.js" "$@"

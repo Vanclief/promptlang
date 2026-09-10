@@ -6,3 +6,11 @@ Pinned release: rust-v0.153.4
 PromptLang's modifications add lexical instruction highlighting to the terminal
 composer. PromptLang is an independent prototype and is not an official OpenAI
 plugin or release.
+
+The Pi extension and Claude Code external editor use the separately installed
+@earendil-works/pi-tui and @earendil-works/pi-coding-agent packages (MIT).
+Their source and licenses remain in their npm distributions.
+Upstream: https://github.com/earendil-works/pi
+
+Claude Code is a separate proprietary product. PromptLang does not redistribute
+or patch Claude Code; its launcher configures an external editor.

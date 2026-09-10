@@ -18,21 +18,10 @@ mkdir -p "$build_dir"
 export CARGO_TARGET_DIR="$build_dir/target"
 export CARGO_INCREMENTAL=0
 
-# Reuse the matching official runtime rather than rebuilding V8 for a UI patch.
+# Use the official runtime for this release instead of rebuilding V8 for a UI patch.
 runtime="$build_dir/codex-code-mode-host-0.153.4"
 if [[ ! -x "$runtime" ]]; then
-    codex_command=$(command -v codex || true)
-    if [[ -z "$codex_command" ]] || [[ $("$codex_command" --version) != "codex-cli 0.153.4" ]]; then
-        printf 'A native Codex 0.153.4 installation is required for its Code Mode runtime.\n' >&2
-        exit 1
-    fi
-    codex_binary=$(python3 -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$codex_command")
-    runtime_source="$(dirname -- "$codex_binary")/codex-code-mode-host"
-    if [[ ! -x "$runtime_source" ]]; then
-        printf 'Missing matching native runtime: %s\n' "$runtime_source" >&2
-        exit 1
-    fi
-    cp "$runtime_source" "$runtime"
+    "$repo_root/scripts/prepare-runtime.sh" "$build_dir"
 fi
 mkdir -p "$CARGO_TARGET_DIR/dev-small"
 cp "$runtime" "$CARGO_TARGET_DIR/dev-small/codex-code-mode-host"
