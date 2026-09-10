@@ -13,4 +13,10 @@ Their source and licenses remain in their npm distributions.
 Upstream: https://github.com/earendil-works/pi
 
 Claude Code is a separate proprietary product. PromptLang does not redistribute
-or patch Claude Code; its launcher configures an external editor.
+Claude Code. Native setup patches a separate local copy of the user's installed
+Claude binary. An external-editor fallback is also provided.
+
+The native integration was informed by Piebald-AI/tweakcc (MIT) and Bun's module
+graph format (MIT). These projects are not runtime dependencies.
+https://github.com/Piebald-AI/tweakcc
+https://github.com/oven-sh/bun

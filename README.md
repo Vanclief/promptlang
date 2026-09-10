@@ -17,7 +17,7 @@ type and keeps the submitted prompt plain text.
 | --- | --- | --- |
 | **Codex CLI** | Separate build of Codex 0.153.4 | Native prompt composer |
 | **Pi** | Custom editor extension | Native prompt composer |
-| **Claude Code** | External terminal editor | **Ctrl+G** while editing a draft |
+| **Claude Code** | Separate patched copy of Claude 2.1.267 | Native prompt composer; Ctrl+G fallback |
 
 Early prototype for **macOS and Linux**. Colors follow your terminal's palette;
 the preview illustrates one light/dark palette. This is a lexical highlighter,
@@ -35,7 +35,8 @@ cd promptlang
 | Install | Run from any project |
 | --- | --- |
 | `./install.sh codex` | `promptlang-codex` |
-| `./install.sh claude` | `promptlang-claude` |
+| `./install.sh claude` | `promptlang-claude` (native) |
+| `./install.sh claude-editor` | `promptlang-claude-editor` (Ctrl+G fallback) |
 | `./install.sh pi` | `promptlang-pi` |
 
 Or install all three with `./install.sh all`.
@@ -59,8 +60,9 @@ directly from `./bin/` after setup.
 ### Requirements
 
 - **Claude and Pi:** Node.js **22.19+** with npm. Claude Code must already be
-  installed. Pi uses your installed CLI, or the pinned local Pi **0.85.0** that
-  setup installs as a dependency.
+  installed. **Native Claude currently requires its native 2.1.267 binary** and
+  macOS needs `codesign`; other versions can use `claude-editor`. Pi uses your
+  installed CLI, or the pinned local Pi **0.85.0** installed with dependencies.
 - **Codex:** Rust installed through rustup, Python 3, Git, curl, tar, shasum, and
   a C/C++ build toolchain. The pinned source selects Rust **1.95.0**. On macOS,
   install Xcode Command Line Tools. Linux needs the native build dependencies,
@@ -107,26 +109,42 @@ RPC sessions are unaffected. See Pi's
 
 ### Claude Code
 
-Start `promptlang-claude`, type a draft, and press **Ctrl+G**.
+Start **`promptlang-claude`** and type normally. Conditions, prohibitions, and
+requirements light up directly in Claude's input box. No editor shortcut is
+needed. Claude keeps its native editing, wrapping, history, and submission flow.
+The word under the cursor temporarily keeps Claude's native cursor presentation.
 
-| In the highlighted editor | Action |
+Setup patches a **separate copy** of your installed Claude **2.1.267** inside
+`.build/claude/`. It verifies the binary layout, signs the copy on macOS, and
+checks that the result launches. Your original `claude` executable is untouched.
+This is an unofficial local patch, not an Anthropic plugin API. No Claude source
+or executable is redistributed in this repository.
+
+The launcher uses your normal Claude login and configuration. It disables
+updates only for the patched process so an update cannot replace the patch.
+Update through your original `claude` command, then rerun `./install.sh claude`
+once PromptLang supports that version. An unsupported version or changed binary
+layout stops setup and preserves an existing working copy.
+
+**External editor fallback:** if you use another Claude version, install with
+`./install.sh claude-editor`, run `promptlang-claude-editor`, and press **Ctrl+G**.
+The native installation also includes this fallback and keeps Ctrl+G available.
+
+| In the external highlighted editor | Action |
 | --- | --- |
 | **Enter** | Insert a newline |
 | **Ctrl+S** | Save and return to Claude's draft |
 | **Ctrl+C** | Cancel and keep the original draft |
 
-Saving returns the text to Claude **without submitting it**. The launcher sets
+Saving returns the text to Claude **without submitting it**. Both launchers set
 `VISUAL` and `EDITOR` for that Claude process and its children. Other Claude
-actions that open the configured external editor use PromptLang too.
-
-Claude's documented extension API has no input-token rendering hook, so
-highlighting is available through its supported
+actions that open the configured external editor use PromptLang too. See Claude's
 [external editor shortcut](https://code.claude.com/docs/en/interactive-mode).
-Its built-in composer is unchanged. Tested end to end with Claude Code **2.1.267**.
 
-Cancel and no-op saves preserve the original file byte-for-byte. Actual edits use
-Pi's editor conventions: LF newlines and tabs expanded to four spaces. Save
-reports a conflict if another process changes the file while you edit.
+External-editor cancel and no-op saves preserve the original file byte-for-byte.
+Actual edits in that fallback use Pi's conventions: LF newlines and tabs expanded
+to four spaces. Save reports a conflict if another process changes the file.
+These conversions do not apply to the native composer patch.
 
 ## The colors
 
@@ -177,10 +195,12 @@ npm ci --ignore-scripts
 npm test
 ```
 
-Twenty JavaScript tests cover editor rendering, cursor behavior, Unicode,
-pastes, Claude save/cancel, and installer safety. CI runs them on macOS/Linux
-with Node 22/24. The Codex overlay has 15 passing prototype tests; its full suite
-has 35 known upstream failures reproduced without PromptLang.
+Twenty-nine JavaScript tests cover editor rendering, cursor behavior, Unicode,
+pastes, Claude save/cancel, native patch boundaries, version checks, and installer
+safety. CI runs them on macOS/Linux with Node 22/24, and separately prepares and
+launches native Claude copies from the official platform packages. The Codex
+overlay has 15 passing prototype tests; its full suite has 35 known upstream
+failures reproduced without PromptLang.
 
 See [development notes](docs/development.md) for Codex builds, tests, dependency
 pins, vocabulary changes, and preview generation. Small contributions and

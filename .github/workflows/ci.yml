@@ -26,3 +26,29 @@ jobs:
         run: |
           node scripts/render-preview.mjs
           git diff --exit-code -- docs/assets
+
+  native-claude:
+    name: Native Claude (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      DISABLE_UPDATES: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare from the official native package
+        shell: bash
+        run: |
+          native_version=$(node --input-type=module -e 'import { nativeVersion } from "./claude/native-patch.js"; console.log(nativeVersion)')
+          native_package="@anthropic-ai/claude-code-$(node -p 'process.platform')-$(node -p 'process.arch')@$native_version"
+          native_dir=$(mktemp -d)
+          native_archive=$(npm pack "$native_package" --pack-destination "$native_dir" --ignore-scripts --silent)
+          tar -xzf "$native_dir/$native_archive" -C "$native_dir"
+          node scripts/prepare-claude.mjs "$native_dir/package/claude"
+          ./bin/promptlang-claude --version
+          ./bin/promptlang-claude --help

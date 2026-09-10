@@ -76,12 +76,12 @@ test("save detects another writer and leaves that file intact", async (context) 
   assert.equal(saved, "changed elsewhere");
 });
 
-test("Claude launcher preserves cwd and arguments and handles spaces in its own path", (context) => {
+test("Claude external launcher preserves cwd and arguments and handles spaces in its own path", (context) => {
   const directory = mkdtempSync(join(tmpdir(), "promptlang launcher "));
   context.after(() => rmSync(directory, { recursive: true, force: true }));
   const bin = join(directory, "repo with spaces", "bin");
   mkdirSync(bin, { recursive: true });
-  cpSync(new URL("../bin/promptlang-claude", import.meta.url), join(bin, "promptlang-claude"));
+  cpSync(new URL("../bin/promptlang-claude-editor", import.meta.url), join(bin, "promptlang-claude"));
   const mock = join(directory, "claude");
   writeFileSync(mock, `#!/usr/bin/env node\nconsole.log(JSON.stringify({cwd: process.cwd(), args: process.argv.slice(2), editor: process.env.EDITOR, visual: process.env.VISUAL, path: process.env.PATH}));\n`, { mode: 0o755 });
   const result = spawnSync(join(bin, "promptlang-claude"), ["--model", "a model", "literal $HOME `text`"], {

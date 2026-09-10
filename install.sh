@@ -6,14 +6,16 @@ action=install
 target=
 usage() {
   cat <<'HELP'
-Usage: ./install.sh <codex|claude|pi|all> [--bin-dir DIRECTORY] [--uninstall]
+Usage: ./install.sh <codex|claude|claude-editor|pi|all> [--bin-dir DIRECTORY] [--uninstall]
 
-Installs promptlang-codex, promptlang-claude, and/or promptlang-pi launchers.
+Installs PromptLang launchers. Claude defaults to native composer highlighting.
+Use claude-editor for the Ctrl+G fallback without patching a Claude copy.
 Default destination: ~/.local/bin. Keep this repository after installing.
 
 Codex needs Rust via rustup, Python 3, Git, curl, tar, and shasum, plus a
 C/C++ build toolchain. Its first build can take substantial time and disk space.
 Claude and Pi need Node.js 22.19+ and npm. Claude Code must already be installed.
+Native highlighting supports Claude 2.1.267; macOS also needs codesign.
 Pi uses your installed Pi, or the pinned local Pi installed with dependencies.
 
 Examples:
@@ -25,7 +27,7 @@ HELP
 }
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    codex|claude|pi|all)
+    codex|claude|claude-editor|pi|all)
       [[ -z "$target" ]] || { echo 'Choose one target (or all).' >&2; exit 2; }
       target=$1; shift ;;
     --bin-dir)
@@ -49,7 +51,8 @@ esac
 launchers=()
 for client in "${clients[@]}"; do
   launchers+=("promptlang-$client")
-  if [[ "$client" == claude ]]; then launchers+=(promptlang-editor); fi
+  if [[ "$client" == claude ]]; then launchers+=(promptlang-claude-editor promptlang-editor); fi
+  if [[ "$client" == claude-editor ]]; then launchers+=(promptlang-editor); fi
 done
 marker='# Managed by PromptLang installer'
 # Preflight every destination before building or changing any launcher.
@@ -75,8 +78,8 @@ if [[ "$action" == uninstall ]]; then
 fi
 needs_js=false
 for client in "${clients[@]}"; do
-  if [[ "$client" == claude || "$client" == pi ]]; then needs_js=true; fi
-  if [[ "$client" == claude ]] && ! command -v claude >/dev/null 2>&1; then
+  if [[ "$client" == claude || "$client" == claude-editor || "$client" == pi ]]; then needs_js=true; fi
+  if [[ "$client" == claude || "$client" == claude-editor ]] && ! command -v claude >/dev/null 2>&1; then
     echo 'Install Claude Code first: https://code.claude.com/docs/en/setup' >&2
     exit 1
   fi
@@ -91,6 +94,7 @@ if [[ "$needs_js" == true ]]; then
 fi
 for client in "${clients[@]}"; do
   if [[ "$client" == codex ]]; then "$promptlang_root/scripts/build.sh"; fi
+  if [[ "$client" == claude ]]; then node "$promptlang_root/scripts/prepare-claude.mjs" "$(command -v claude)"; fi
 done
 mkdir -p "$promptlang_bin_dir"
 for launcher in "${launchers[@]}"; do
@@ -110,5 +114,8 @@ esac
 printf '\nReady. Start a client:\n'
 for client in "${clients[@]}"; do printf '  promptlang-%s\n' "$client"; done
 if [[ "$target" == claude || "$target" == all ]]; then
+  printf '\nClaude Code: highlighting is native. Ctrl+G also opens the external editor.\n'
+fi
+if [[ "$target" == claude-editor ]]; then
   printf '\nClaude Code: press Ctrl+G to open the highlighted editor.\n'
 fi

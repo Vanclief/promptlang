@@ -2,7 +2,7 @@
   "name": "promptlang",
   "version": "0.1.0",
   "private": true,
-  "description": "Instruction highlighting for Codex, Pi, and Claude Code's external editor",
+  "description": "Native instruction highlighting for Codex CLI, Pi, and Claude Code",
   "type": "module",
   "license": "Apache-2.0",
   "engines": { "node": ">=22.19.0" },

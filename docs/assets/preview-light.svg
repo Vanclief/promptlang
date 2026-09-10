@@ -13,6 +13,6 @@
 <text x="58" y="238" xml:space="preserve"><tspan fill="#7734a1" font-weight="400">If</tspan> checks fail, you <tspan fill="#086d87" font-weight="700">must</tspan> fix <tspan fill="#086d87" font-weight="400">every</tspan> failure.</text>
 <text x="58" y="274" xml:space="preserve">You <tspan fill="#256d35" font-weight="400">may</tspan> use <tspan fill="#086d87" font-weight="400">at most</tspan> 3 attempts; <tspan fill="#7734a1" font-weight="400">otherwise</tspan> stop.</text>
 <text x="58" y="310" xml:space="preserve">Run checks <tspan fill="#253449" font-weight="700">before</tspan> finishing. <tspan fill="#b52139" font-weight="400">Avoid</tspan> unrelated changes.</text></g>
-<text x="38" y="389" font-family="system-ui, sans-serif" font-size="15" fill="#52647b">Codex CLI · Pi extension · Claude Code via Ctrl+G</text>
+<text x="38" y="389" font-family="system-ui, sans-serif" font-size="15" fill="#52647b">Native highlighting · Codex CLI · Pi · Claude Code</text>
 <text x="1002" y="389" text-anchor="end" font-family="system-ui, sans-serif" font-size="15" fill="#52647b">Plain text in. Clear instructions.</text>
 </svg>

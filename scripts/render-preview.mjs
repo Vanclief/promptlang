@@ -42,7 +42,7 @@ for (const [name, palette] of Object.entries(palettes)) {
 <circle cx="48" cy="100" r="4" fill="${palette.red}"/><circle cx="64" cy="100" r="4" fill="${palette.magenta}"/><circle cx="80" cy="100" r="4" fill="${palette.green}"/>
 <text x="982" y="105" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="${palette.muted}">prompt.txt</text>
 <g font-family="Menlo, Consolas, monospace" font-size="21" fill="${palette.fg}">${rows}</g>
-<text x="38" y="389" font-family="system-ui, sans-serif" font-size="15" fill="${palette.muted}">Codex CLI · Pi extension · Claude Code via Ctrl+G</text>
+<text x="38" y="389" font-family="system-ui, sans-serif" font-size="15" fill="${palette.muted}">Native highlighting · Codex CLI · Pi · Claude Code</text>
 <text x="1002" y="389" text-anchor="end" font-family="system-ui, sans-serif" font-size="15" fill="${palette.muted}">Plain text in. Clear instructions.</text>
 </svg>\n`;
   writeFileSync(new URL(`../docs/assets/preview-${name}.svg`, import.meta.url), svg);
