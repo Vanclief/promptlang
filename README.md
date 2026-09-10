@@ -34,12 +34,15 @@ cd promptlang
 
 | Install | Run from any project |
 | --- | --- |
-| `./install.sh codex` | `promptlang-codex` |
-| `./install.sh claude` | `promptlang-claude` (native) |
-| `./install.sh claude-editor` | `promptlang-claude-editor` (Ctrl+G fallback) |
+| `./install.sh codex` | `codex-pl` |
+| `./install.sh claude` | `claude-pl` (native) |
+| `./install.sh claude-editor` | `claude-pl-editor` (Ctrl+G fallback) |
 | `./install.sh pi` | `promptlang-pi` |
 
 Or install all three with `./install.sh all`.
+
+Updating an existing installation replaces the old `promptlang-codex` and
+`promptlang-claude` launchers with `codex-pl` and `claude-pl`.
 
 The installer prepares dependencies and adds launchers to `~/.local/bin`. It
 refuses to overwrite unrelated commands. Your existing `codex`, `claude`, and
@@ -85,7 +88,7 @@ You may use at most 3 attempts; otherwise stop.
 
 ### Codex CLI
 
-Start `promptlang-codex` and type normally. Keywords update while you edit, wrap,
+Start `codex-pl` and type normally. Keywords update while you edit, wrap,
 and search your history. Native mentions, attachments, shell mode, and masked
 input keep their existing presentation. This uses your normal Codex login and
 configuration. The desktop and IDE composers are separate.
@@ -109,7 +112,7 @@ RPC sessions are unaffected. See Pi's
 
 ### Claude Code
 
-Start **`promptlang-claude`** and type normally. Conditions, prohibitions, and
+Start **`claude-pl`** and type normally. Conditions, prohibitions, and
 requirements light up directly in Claude's input box. No editor shortcut is
 needed. Claude keeps its native editing, wrapping, history, and submission flow.
 The word under the cursor temporarily keeps Claude's native cursor presentation.
@@ -127,7 +130,7 @@ once PromptLang supports that version. An unsupported version or changed binary
 layout stops setup and preserves an existing working copy.
 
 **External editor fallback:** if you use another Claude version, install with
-`./install.sh claude-editor`, run `promptlang-claude-editor`, and press **Ctrl+G**.
+`./install.sh claude-editor`, run `claude-pl-editor`, and press **Ctrl+G**.
 The native installation also includes this fallback and keeps Ctrl+G available.
 
 | In the external highlighted editor | Action |
@@ -195,7 +198,7 @@ npm ci --ignore-scripts
 npm test
 ```
 
-Twenty-nine JavaScript tests cover editor rendering, cursor behavior, Unicode,
+Thirty-two JavaScript tests cover editor rendering, cursor behavior, Unicode,
 pastes, Claude save/cancel, native patch boundaries, version checks, and installer
 safety. CI runs them on macOS/Linux with Node 22/24, and separately prepares and
 launches native Claude copies from the official platform packages. The Codex

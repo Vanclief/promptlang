@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+promptlang_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+claude_binary="$promptlang_root/.build/claude/claude"
+if [[ ! -x "$claude_binary" ]]; then
+  echo 'Run ./install.sh claude from the PromptLang repository first.' >&2
+  echo 'For the Ctrl+G fallback, use claude-pl-editor.' >&2
+  exit 1
+fi
+export PATH="$promptlang_root/bin:$PATH"
+export VISUAL=promptlang-editor
+export EDITOR=promptlang-editor
+# Updates must go through the original client, followed by the PromptLang installer.
+export DISABLE_AUTOUPDATER=1
+export DISABLE_UPDATES=1
+exec "$claude_binary" "$@"

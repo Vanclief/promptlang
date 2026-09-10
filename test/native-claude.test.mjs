@@ -157,8 +157,8 @@ test("native launcher uses the separate binary, forwards arguments, and disables
   const bin = join(directory, "bin");
   mkdirSync(bin);
   mkdirSync(join(directory, ".build/claude"), { recursive: true });
-  const launcher = join(bin, "promptlang-claude");
-  cpSync(new URL("../bin/promptlang-claude", import.meta.url), launcher);
+  const launcher = join(bin, "claude-pl");
+  cpSync(new URL("../bin/claude-pl", import.meta.url), launcher);
   const missing = spawnSync(launcher, [], { encoding: "utf8" });
   assert.equal(missing.status, 1);
   assert.match(missing.stderr, /install.sh claude/);

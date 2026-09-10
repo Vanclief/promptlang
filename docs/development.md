@@ -77,7 +77,7 @@ locally, and verify launch without logging in or making model requests.
 ```sh
 npm ci --ignore-scripts
 npm test
-bash -n install.sh scripts/*.sh bin/promptlang-*
+for script in install.sh scripts/*.sh bin/*; do bash -n "$script"; done
 ```
 
 JavaScript tests exercise actual Pi editor components and xterm terminal cells.

@@ -81,10 +81,10 @@ test("Claude external launcher preserves cwd and arguments and handles spaces in
   context.after(() => rmSync(directory, { recursive: true, force: true }));
   const bin = join(directory, "repo with spaces", "bin");
   mkdirSync(bin, { recursive: true });
-  cpSync(new URL("../bin/promptlang-claude-editor", import.meta.url), join(bin, "promptlang-claude"));
+  cpSync(new URL("../bin/claude-pl-editor", import.meta.url), join(bin, "claude-pl-editor"));
   const mock = join(directory, "claude");
   writeFileSync(mock, `#!/usr/bin/env node\nconsole.log(JSON.stringify({cwd: process.cwd(), args: process.argv.slice(2), editor: process.env.EDITOR, visual: process.env.VISUAL, path: process.env.PATH}));\n`, { mode: 0o755 });
-  const result = spawnSync(join(bin, "promptlang-claude"), ["--model", "a model", "literal $HOME `text`"], {
+  const result = spawnSync(join(bin, "claude-pl-editor"), ["--model", "a model", "literal $HOME `text`"], {
     cwd: directory, encoding: "utf8", env: { ...process.env, PATH: `${directory}:${process.env.PATH}` },
   });
   assert.equal(result.status, 0, result.stderr);

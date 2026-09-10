@@ -8,7 +8,8 @@ usage() {
   cat <<'HELP'
 Usage: ./install.sh <codex|claude|claude-editor|pi|all> [--bin-dir DIRECTORY] [--uninstall]
 
-Installs PromptLang launchers. Claude defaults to native composer highlighting.
+Installs codex-pl, claude-pl, and/or promptlang-pi.
+Claude defaults to native composer highlighting.
 Use claude-editor for the Ctrl+G fallback without patching a Claude copy.
 Default destination: ~/.local/bin. Keep this repository after installing.
 
@@ -49,12 +50,37 @@ case "$target" in
   *) clients=("$target") ;;
 esac
 launchers=()
+commands=()
+legacy_launchers=()
 for client in "${clients[@]}"; do
-  launchers+=("promptlang-$client")
-  if [[ "$client" == claude ]]; then launchers+=(promptlang-claude-editor promptlang-editor); fi
-  if [[ "$client" == claude-editor ]]; then launchers+=(promptlang-editor); fi
+  case "$client" in
+    codex)
+      client_command=codex-pl
+      legacy_launchers+=(promptlang-codex) ;;
+    claude)
+      client_command=claude-pl
+      launchers+=(claude-pl-editor promptlang-editor)
+      legacy_launchers+=(promptlang-claude promptlang-claude-editor) ;;
+    claude-editor)
+      client_command=claude-pl-editor
+      launchers+=(promptlang-editor)
+      legacy_launchers+=(promptlang-claude-editor) ;;
+    pi) client_command=promptlang-pi ;;
+  esac
+  commands+=("$client_command")
+  launchers+=("$client_command")
 done
 marker='# Managed by PromptLang installer'
+remove_legacy_launchers() {
+  if [[ ${#legacy_launchers[@]} -eq 0 ]]; then return; fi
+  for launcher in "${legacy_launchers[@]}"; do
+    destination="$promptlang_bin_dir/$launcher"
+    if [[ -f "$destination" && ! -L "$destination" ]] && head -n 2 "$destination" | tail -n 1 | grep -Fqx "$marker"; then
+      rm -- "$destination"
+      printf 'Removed old launcher %s\n' "$destination"
+    fi
+  done
+}
 # Preflight every destination before building or changing any launcher.
 for launcher in "${launchers[@]}"; do
   destination="$promptlang_bin_dir/$launcher"
@@ -73,6 +99,7 @@ if [[ "$action" == uninstall ]]; then
       printf 'Removed %s\n' "$destination"
     fi
   done
+  remove_legacy_launchers
   echo 'Repository, build cache, client installations, and settings were kept.'
   exit 0
 fi
@@ -107,12 +134,13 @@ for launcher in "${launchers[@]}"; do
   trap - EXIT
   printf 'Installed %s\n' "$destination"
 done
+remove_legacy_launchers
 case ":$PATH:" in
   *":$promptlang_bin_dir:"*) ;;
   *) printf '\nAdd the launcher directory to your PATH:\n  export PATH=%q:"$PATH"\n' "$promptlang_bin_dir" ;;
 esac
 printf '\nReady. Start a client:\n'
-for client in "${clients[@]}"; do printf '  promptlang-%s\n' "$client"; done
+for client_command in "${commands[@]}"; do printf '  %s\n' "$client_command"; done
 if [[ "$target" == claude || "$target" == all ]]; then
   printf '\nClaude Code: highlighting is native. Ctrl+G also opens the external editor.\n'
 fi
